@@ -1,17 +1,17 @@
 import dotenv from 'dotenv';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-const __rootdir = dirname(dirname(fileURLToPath(import.meta.url)));
+const __rootdir = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 dotenv.config({ path: join(__rootdir, '.env') });
 
-import express from 'express';
-import cors from 'cors';
-import authRoutes from './routes/auth.js';
-import quizRoutes from './routes/quiz.js';
-import chapterRoutes from './routes/chapters.js';
-import diagnosisRoutes from './routes/diagnosis.js';
-import progressRoutes from './routes/progress.js';
-import userRoutes from './routes/user.js';
+const express = (await import('express')).default;
+const cors = (await import('cors')).default;
+const { default: authRoutes } = await import('./routes/auth.js');
+const { default: quizRoutes } = await import('./routes/quiz.js');
+const { default: chapterRoutes } = await import('./routes/chapters.js');
+const { default: diagnosisRoutes } = await import('./routes/diagnosis.js');
+const { default: progressRoutes } = await import('./routes/progress.js');
+const { default: userRoutes } = await import('./routes/user.js');
 
 const app = express();
 app.use(cors());
