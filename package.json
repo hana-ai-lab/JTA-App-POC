@@ -1,0 +1,5 @@
+{
+  "name": "jta-app",
+  "private": true,
+  "workspaces": ["server", "client"]
+}
