@@ -65,14 +65,14 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(27, 42, 74, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 20% 20%, rgba(11, 13, 30, 0.03) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(212, 168, 83, 0.03) 0%, transparent 50%),
     repeating-linear-gradient(
       45deg,
       transparent,
       transparent 60px,
-      rgba(27, 42, 74, 0.008) 60px,
-      rgba(27, 42, 74, 0.008) 61px
+      rgba(11, 13, 30, 0.008) 60px,
+      rgba(11, 13, 30, 0.008) 61px
     );
   pointer-events: none;
   z-index: 0;
@@ -116,7 +116,7 @@ h1, h2, h3 {
   background: rgba(250, 251, 253, 0.95);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  border-top: 1px solid rgba(174, 180, 192, 0.3);
 }
 
 .nav-link {
@@ -133,14 +133,14 @@ h1, h2, h3 {
 
 .nav-link:hover {
   color: var(--color-primary);
-  background: rgba(27, 42, 74, 0.04);
+  background: rgba(11, 13, 30, 0.04);
 }
 
 .nav-link.active {
   color: var(--color-bg);
   background: var(--color-primary);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(27, 42, 74, 0.2);
+  box-shadow: 0 2px 8px rgba(11, 13, 30, 0.2);
 }
 
 /* --- Buttons --- */
@@ -240,8 +240,8 @@ button:active {
 
 .btn-choice.selected {
   border-color: var(--color-primary);
-  background: rgba(27, 42, 74, 0.05);
-  box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08);
+  background: rgba(11, 13, 30, 0.05);
+  box-shadow: 0 0 0 3px rgba(11, 13, 30, 0.08);
 }
 
 .btn-choice.selected .choice-label {
@@ -278,7 +278,7 @@ button:active {
 .card {
   background: var(--color-bg-card);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.6);
+  border: 1px solid rgba(174, 180, 192, 0.3);
   border-radius: var(--radius-lg);
   padding: 20px;
   box-shadow: var(--shadow-sm);
@@ -296,7 +296,7 @@ button:active {
 .card-clickable:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(27, 42, 74, 0.12);
+  border-color: rgba(11, 13, 30, 0.12);
 }
 
 .card-clickable:active {
@@ -601,7 +601,7 @@ button:active {
   gap: 10px;
   margin-top: 10px;
   padding: 6px 16px;
-  background: rgba(27, 42, 74, 0.04);
+  background: rgba(11, 13, 30, 0.04);
   border-radius: 100px;
 }
 
@@ -689,7 +689,7 @@ button:active {
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-primary-lighter);
-  background: rgba(27, 42, 74, 0.06);
+  background: rgba(11, 13, 30, 0.06);
   padding: 3px 10px;
   border-radius: 100px;
   letter-spacing: 0.06em;
@@ -758,7 +758,7 @@ button:active {
 }
 
 .stat-tag.complete {
-  background: rgba(27, 42, 74, 0.08);
+  background: rgba(11, 13, 30, 0.08);
   color: var(--color-primary-lighter);
 }
 
@@ -936,7 +936,7 @@ button:active {
 }
 
 .ch-badge.in-progress {
-  background: rgba(27, 42, 74, 0.08);
+  background: rgba(11, 13, 30, 0.08);
   color: var(--color-primary-lighter);
 }
 
@@ -964,12 +964,12 @@ button:active {
 }
 
 .chapter-card-compact.completed {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(27, 42, 74, 0.06) 100%);
-  border-color: rgba(27, 42, 74, 0.2);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(11, 13, 30, 0.06) 100%);
+  border-color: rgba(11, 13, 30, 0.2);
 }
 
 .chapter-card-compact.in-progress {
-  border-color: rgba(45, 68, 112, 0.2);
+  border-color: rgba(16, 19, 38, 0.2);
 }
 
 
