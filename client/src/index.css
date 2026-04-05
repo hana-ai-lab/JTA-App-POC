@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;800&family=Inter:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --color-primary: #1B2A4A;
-  --color-primary-light: #2D4470;
-  --color-primary-lighter: #3D5A8A;
+  --color-primary: #0B0D1E;
+  --color-primary-light: #101326;
+  --color-primary-lighter: #1A1633;
   --color-accent: #D4A853;
   --color-accent-light: #F0D48A;
   --color-bg: #FAFBFD;
   --color-bg-secondary: #F0F2F7;
   --color-bg-card: rgba(255, 255, 255, 0.82);
   --color-bg-card-hover: rgba(255, 255, 255, 0.95);
-  --color-text: #1B2A4A;
-  --color-text-muted: #7A8BA0;
+  --color-text: #0B0D1E;
+  --color-text-muted: #AEB4C0;
   --color-success: #2ECC71;
   --color-success-bg: #E8F8F0;
   --color-error: #E74C3C;
   --color-error-bg: #FDECEB;
-  --color-border: #E2E8F0;
-  --color-glow: rgba(27, 42, 74, 0.12);
+  --color-border: rgba(174, 180, 192, 0.35);
+  --color-glow: rgba(11, 13, 30, 0.12);
   --font-display: 'Noto Serif JP', serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -25,9 +25,9 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --shadow-sm: 0 1px 3px rgba(27, 42, 74, 0.06);
-  --shadow-md: 0 4px 16px rgba(27, 42, 74, 0.08);
-  --shadow-lg: 0 8px 32px rgba(27, 42, 74, 0.10);
+  --shadow-sm: 0 1px 3px rgba(11, 13, 30, 0.06);
+  --shadow-md: 0 4px 16px rgba(11, 13, 30, 0.08);
+  --shadow-lg: 0 8px 32px rgba(11, 13, 30, 0.10);
   --shadow-glow: 0 0 24px rgba(212, 168, 83, 0.15);
   --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-med: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -595,7 +595,7 @@ button:active {
 
 /* --- Today Activity --- */
 .today-activity {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -603,7 +603,6 @@ button:active {
   padding: 6px 16px;
   background: rgba(27, 42, 74, 0.04);
   border-radius: 100px;
-  display: inline-flex;
 }
 
 .today-stat {
