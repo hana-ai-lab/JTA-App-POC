@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: jta-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-jta}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - jta-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: ./server
+    container_name: jta-server
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-jta}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - jta-network
+
+  client:
+    build: ./client
+    container_name: jta-client
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - VITE_PORT=8000
+      - PROXY_TARGET=http://server:3001
+    depends_on:
+      - server
+    networks:
+      - jta-network
+
+networks:
+  jta-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
