@@ -1,0 +1,5 @@
+ALTER TABLE chapters
+  ADD COLUMN course VARCHAR(20) NOT NULL DEFAULT 'basic_pro',
+  ADD COLUMN section_number INT NOT NULL DEFAULT 1,
+  ADD COLUMN section_title VARCHAR(255) NOT NULL DEFAULT '',
+  ADD COLUMN week_number INT NOT NULL DEFAULT 1;

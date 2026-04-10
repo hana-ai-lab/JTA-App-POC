@@ -19,57 +19,57 @@ router.get('/session', authenticate, async (req, res) => {
 
     const chapterId = req.query.chapterId ? parseInt(req.query.chapterId, 10) : null;
 
-    // 1. Due quizzes
-    let dueParams = [userId, now];
-    let chapterFilterDue = '';
-    if (chapterId) {
-      chapterFilterDue = `AND q.chapter_id = $${dueParams.length + 1}`;
-      dueParams.push(chapterId);
-    }
-    const dueResult = await pool.query(
-      `SELECT q.id as quiz_id, q.* FROM quizzes q
-       JOIN user_quiz_progress p ON p.quiz_id = q.id AND p.user_id = $1
-       WHERE p.next_due_at <= $2 AND p.correct_streak < 4
-       ${planFilter} ${chapterFilterDue}
-       ORDER BY p.next_due_at ASC`,
-      dueParams
-    );
+    let quizzes;
 
-    // 2. Wrong quizzes
-    let wrongParams = [userId, now];
-    let chapterFilterWrong = '';
     if (chapterId) {
-      chapterFilterWrong = `AND q.chapter_id = $${wrongParams.length + 1}`;
-      wrongParams.push(chapterId);
-    }
-    const wrongResult = await pool.query(
-      `SELECT q.id as quiz_id, q.* FROM quizzes q
-       JOIN user_quiz_progress p ON p.quiz_id = q.id AND p.user_id = $1
-       WHERE p.correct_streak = 0 AND p.seen = true
-       AND (p.next_due_at IS NULL OR p.next_due_at > $2)
-       ${planFilter} ${chapterFilterWrong}`,
-      wrongParams
-    );
+      // Chapter review mode: return all quizzes in the chapter (including mastered),
+      // ordered by lowest streak first (wrong/unseen → due → mastered)
+      const result = await pool.query(
+        `SELECT q.id as quiz_id, q.*,
+           COALESCE(p.correct_streak, 0) AS correct_streak
+         FROM quizzes q
+         LEFT JOIN user_quiz_progress p ON p.quiz_id = q.id AND p.user_id = $1
+         WHERE q.chapter_id = $2 ${planFilter}
+         ORDER BY COALESCE(p.correct_streak, 0) ASC, q.sort_order ASC`,
+        [userId, chapterId]
+      );
+      quizzes = result.rows.map(({ correct_answer, quiz_id, ...rest }) => rest);
+    } else {
+      // Home mode: SRS session (due → wrong → unseen, capped at SESSION_SIZE)
+      // 1. Due quizzes
+      const dueResult = await pool.query(
+        `SELECT q.id as quiz_id, q.* FROM quizzes q
+         JOIN user_quiz_progress p ON p.quiz_id = q.id AND p.user_id = $1
+         WHERE p.next_due_at <= $2 AND p.correct_streak < 4
+         ${planFilter}
+         ORDER BY p.next_due_at ASC`,
+        [userId, now]
+      );
 
-    // 3. Unseen quizzes
-    let unseenParams = [userId];
-    let chapterFilterUnseen = '';
-    if (chapterId) {
-      chapterFilterUnseen = `AND q.chapter_id = $${unseenParams.length + 1}`;
-      unseenParams.push(chapterId);
-    }
-    const unseenResult = await pool.query(
-      `SELECT q.id as quiz_id, q.* FROM quizzes q
-       WHERE q.id NOT IN (
-         SELECT quiz_id FROM user_quiz_progress WHERE user_id = $1
-       )
-       ${planFilter} ${chapterFilterUnseen}
-       ORDER BY q.chapter_id, q.sort_order`,
-      unseenParams
-    );
+      // 2. Wrong quizzes
+      const wrongResult = await pool.query(
+        `SELECT q.id as quiz_id, q.* FROM quizzes q
+         JOIN user_quiz_progress p ON p.quiz_id = q.id AND p.user_id = $1
+         WHERE p.correct_streak = 0 AND p.seen = true
+         AND (p.next_due_at IS NULL OR p.next_due_at > $2)
+         ${planFilter}`,
+        [userId, now]
+      );
 
-    const session = buildSession(dueResult.rows, wrongResult.rows, unseenResult.rows);
-    const quizzes = session.map(({ correct_answer, quiz_id, ...rest }) => rest);
+      // 3. Unseen quizzes
+      const unseenResult = await pool.query(
+        `SELECT q.id as quiz_id, q.* FROM quizzes q
+         WHERE q.id NOT IN (
+           SELECT quiz_id FROM user_quiz_progress WHERE user_id = $1
+         )
+         ${planFilter}
+         ORDER BY q.chapter_id, q.sort_order`,
+        [userId]
+      );
+
+      const session = buildSession(dueResult.rows, wrongResult.rows, unseenResult.rows);
+      quizzes = session.map(({ correct_answer, quiz_id, ...rest }) => rest);
+    }
 
     res.json({ quizzes });
   } catch (err) {
@@ -105,11 +105,12 @@ router.post('/answer', authenticate, async (req, res) => {
     const nextDueAt = getNextDueAt(currentStreak, isCorrect, now);
 
     await pool.query(
-      `INSERT INTO user_quiz_progress (user_id, quiz_id, correct_streak, next_due_at, seen)
-       VALUES ($1, $2, $3, $4, true)
+      `INSERT INTO user_quiz_progress (user_id, quiz_id, correct_streak, next_due_at, seen, ever_correct)
+       VALUES ($1, $2, $3, $4, true, $5)
        ON CONFLICT (user_id, quiz_id)
-       DO UPDATE SET correct_streak = $3, next_due_at = $4, seen = true`,
-      [userId, quizId, newStreak, nextDueAt]
+       DO UPDATE SET correct_streak = $3, next_due_at = $4, seen = true,
+         ever_correct = user_quiz_progress.ever_correct OR $5`,
+      [userId, quizId, newStreak, nextDueAt, isCorrect]
     );
 
     // XP
@@ -168,6 +169,7 @@ router.post('/answer', authenticate, async (req, res) => {
     res.json({
       correct: isCorrect,
       correctAnswer: quiz.correct_answer,
+      explanation: quiz.explanation || null,
       xpGained: xpGained + (chapterMastered ? 50 : 0),
       chapterMastered,
     });

@@ -15,10 +15,32 @@ router.get('/', authenticate, async (req, res) => {
     );
 
     const totalResult = await pool.query('SELECT COUNT(*)::int AS total FROM quizzes');
+    const completedResult = await pool.query(
+      `SELECT COUNT(*)::int AS completed FROM user_quiz_progress
+       WHERE user_id = $1 AND ever_correct = true`,
+      [userId]
+    );
     const masteredResult = await pool.query(
       `SELECT COUNT(*)::int AS mastered FROM user_quiz_progress
        WHERE user_id = $1 AND correct_streak >= 4`,
       [userId]
+    );
+
+    // Today's due quizzes (SRS review scheduled for today)
+    const now = new Date();
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    const todayDueResult = await pool.query(
+      `SELECT COUNT(*)::int AS due FROM user_quiz_progress
+       WHERE user_id = $1 AND next_due_at <= $2 AND correct_streak < 4`,
+      [userId, endOfDay]
+    );
+
+    // Today's activity (quizzes answered today + XP earned today)
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayExpResult = await pool.query(
+      `SELECT COALESCE(SUM(exp_change), 0)::int AS exp, COUNT(*)::int AS actions
+       FROM exp_history WHERE user_id = $1 AND created_at >= $2`,
+      [userId, startOfDay]
     );
 
     const user = userResult.rows[0];
@@ -28,7 +50,11 @@ router.get('/', authenticate, async (req, res) => {
       expToNext: 100 - (user.exp % 100),
       streakDays: user.streak_days,
       totalQuizzes: totalResult.rows[0].total,
+      completedQuizzes: completedResult.rows[0].completed,
       masteredQuizzes: masteredResult.rows[0].mastered,
+      todayDue: todayDueResult.rows[0].due,
+      todayExp: todayExpResult.rows[0].exp,
+      todayQuizzes: todayExpResult.rows[0].actions,
     });
   } catch (err) {
     console.error(err);

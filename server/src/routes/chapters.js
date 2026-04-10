@@ -16,7 +16,9 @@ router.get('/', authenticate, async (req, res) => {
 
     const result = await pool.query(
       `SELECT c.id, c.title, c.sort_order,
+              c.course, c.section_number, c.section_title, c.week_number,
               COUNT(q.id)::int AS total_quizzes,
+              COUNT(CASE WHEN p.correct_streak >= 1 THEN 1 END)::int AS completed,
               COUNT(CASE WHEN p.correct_streak >= 4 THEN 1 END)::int AS mastered
        FROM chapters c
        LEFT JOIN quizzes q ON q.chapter_id = c.id ${planFilter}

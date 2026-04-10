@@ -203,6 +203,10 @@ button:active {
   backdrop-filter: blur(8px);
   box-shadow: var(--shadow-sm);
   line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-choice .choice-label {
@@ -225,17 +229,19 @@ button:active {
   border: 1.5px solid var(--color-border);
 }
 
-.btn-choice:hover {
-  border-color: var(--color-primary-light);
-  background: var(--color-bg-card-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
+@media (hover: hover) {
+  .btn-choice:hover {
+    border-color: var(--color-primary-light);
+    background: var(--color-bg-card-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
 
-.btn-choice:hover .choice-label {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+  .btn-choice:hover .choice-label {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
 }
 
 .btn-choice.selected {
