@@ -9,7 +9,9 @@ description: クイズMarkdownファイルをSQLに変換し、DBに流し込ん
 
 ## 前提
 
-- 入力: `docs/quizzes/{course}/week-{NN}.md`
+- 入力:
+  - 中級講座: `docs/quizzes/intermediate/section-*/chapter-{NN}.md`
+  - 入門/基礎など旧形式: `docs/quizzes/{course}/week-{NN}.md`
 - 出力: `server/seeds/001_quiz_data.sql` に追記
 - シードスクリプト: `server/src/seed.js`（`npm run seed` で実行）
 - アプリ構成: monorepo（workspaces: server, client）
@@ -24,9 +26,11 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 
 ### 1. 変換対象の確認
 
-ユーザーに変換するファイルを確認する。指定がなければ AskUserQuestion で聞く。
+ユーザーに変換するファイルを確認する。指定がなければ直接ユーザーに聞く。
 
 対象の指定方法:
+- 中級講座の単一章: `docs/quizzes/intermediate/section-02-economic-indicators/chapter-10.md`
+- 中級講座全体: `docs/quizzes/intermediate/`
 - 単一ファイル: `docs/quizzes/kohaku/week-01.md`
 - コース全体: `docs/quizzes/kohaku/` 配下すべて
 - 全ファイル: `docs/quizzes/` 配下すべて
@@ -35,7 +39,13 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 
 既存のseedファイル（`server/seeds/001_quiz_data.sql`）を読み、chapters INSERT文からcourse・week_number・idの対応を把握する。MDのフロントマターの`title`と既存chapterの`title`を照合して、どのchapter_idに紐付けるか決定する。
 
-**対応が不明な場合は AskUserQuestion でユーザーに確認する。**
+中級講座の場合:
+- MDの `course: intermediate`、`chapter`、`sort_order`、`title` を読む
+- `sort_order` と seed内の中級講座chapterタイトルが一致するか確認する
+- 現行seedでは中級第1章が `chapter_id = 25`、第37章が `chapter_id = 61` のため、原則 `chapter_id = sort_order`
+- `docs/quizzes/kohana/week-13.md`〜`week-18.md` ではなく `docs/quizzes/intermediate/` 配下を入力の正本にする
+
+**対応が不明な場合はユーザーに確認する。**
 
 ### 3. SQL生成とseedファイル更新
 
@@ -58,7 +68,7 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 
 生成したSQLの整合性をチェックする:
 
-- 各ファイル20問あるか
+- 各ファイルの問題数がMDとSQLで一致するか（中級講座は章ごとに問題数が異なる）
 - `correct_answer` が 1〜4 の範囲内か
 - 選択肢が4つとも埋まっているか
 - シングルクォートのエスケープが正しいか（`),,` や `$),` などの不正文字がないか）

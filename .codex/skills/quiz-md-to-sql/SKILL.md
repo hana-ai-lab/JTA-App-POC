@@ -9,7 +9,9 @@ description: クイズMarkdownファイルをSQLに変換し、DBに流し込ん
 
 ## 前提
 
-- 入力: `docs/quizzes/{course}/week-{NN}.md`
+- 入力:
+  - 中級講座: `docs/quizzes/intermediate/section-*/chapter-{NN}.md`
+  - 入門/基礎など旧形式: `docs/quizzes/{course}/week-{NN}.md`
 - 出力: `server/seeds/001_quiz_data.sql`
 - シード実行: `server/src/seed.js` を `npm run seed` で呼ぶ
 - 主な投入先:
@@ -24,6 +26,8 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 
 変換対象を確認する。指定がなければ直接ユーザーに聞く。
 
+- 中級講座の単一章: `docs/quizzes/intermediate/section-02-economic-indicators/chapter-10.md`
+- 中級講座全体: `docs/quizzes/intermediate/`
 - 単一ファイル: `docs/quizzes/kohaku/week-01.md`
 - コース全体: `docs/quizzes/kohaku/`
 - 全ファイル: `docs/quizzes/`
@@ -31,6 +35,13 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 ### 2. chapter との対応確認
 
 `server/seeds/001_quiz_data.sql` を読み、chapter と course/week/title の対応を確認する。対応が曖昧ならユーザーに確認する。
+
+中級講座の場合:
+
+- MDの `course: intermediate`、`chapter`、`sort_order`、`title` を読む
+- `sort_order` と seed内の中級講座chapterタイトルが一致するか確認する
+- 現行seedでは中級第1章が `chapter_id = 25`、第37章が `chapter_id = 61` のため、原則 `chapter_id = sort_order`
+- `docs/quizzes/kohana/week-13.md`〜`week-18.md` ではなく `docs/quizzes/intermediate/` 配下を入力の正本にする
 
 ### 3. SQL生成とseedファイル更新
 
@@ -48,7 +59,7 @@ INSERT INTO quizzes (chapter_id, question, choice_1, choice_2, choice_3, choice_
 
 確認項目:
 
-- 各ファイルの問題数
+- 各ファイルの問題数（中級講座は章ごとに異なるため、MDの件数を正とする）
 - `correct_answer` が 1〜4
 - 選択肢が4件そろっているか
 - クォートのエスケープ
