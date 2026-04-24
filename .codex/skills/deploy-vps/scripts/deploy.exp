@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+set host "85.131.249.99"
+set user "root"
+set password "hana87tradeer-!"
+set remote_path "/root/jta-app"
+set local_path "."
+
+set timeout -1
+
+send_user "Starting Rsync...\n"
+spawn rsync -avz --delete --exclude "node_modules" --exclude ".git" --exclude ".env" --exclude "postgres_data" --exclude "e2e" $local_path/ $user@$host:$remote_path/
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
+
+send_user "Starting Deployment...\n"
+spawn ssh $user@$host
+expect "password:"
+send "$password\r"
+expect "#"
+
+send "cd $remote_path\r"
+expect "#"
+
+send "docker compose -f docker-compose.prod.yml up -d --build\r"
+expect -timeout 300 "#"
+
+send "exit\r"
+expect eof
+
+send_user "Deployment Completed!\n"
+send_user "Note: If this is the first deploy, run: docker exec jta-server npm run seed\n"

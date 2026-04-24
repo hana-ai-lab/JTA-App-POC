@@ -156,6 +156,37 @@ button:active {
   transform: scale(0.97);
 }
 
+.quiz-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 0;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.btn-back:hover {
+  opacity: 1;
+}
+
+.btn-back:active {
+  transform: none;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-lighter) 100%);
   color: white;

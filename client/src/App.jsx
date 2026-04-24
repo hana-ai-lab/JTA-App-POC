@@ -317,6 +317,9 @@ function Quiz() {
 
   return (
     <div className="page">
+      <div className="quiz-top-bar">
+        <button className="btn-back" onClick={() => navigate('/')}>← ホームへ</button>
+      </div>
       <QuizCounter current={currentIndex + 1} total={quizzes.length} />
       <div style={{ marginTop: 20 }}>
         <QuizCard key={currentQuiz.id} quiz={currentQuiz} onAnswer={submitAnswer} />
@@ -491,7 +494,10 @@ function ChapterQuiz() {
 
   return (
     <div className="page">
-      <div className="diagnosis-tag" style={{ marginBottom: 8 }}>{chapter?.section_title} · W{chapter?.week_number}</div>
+      <div className="quiz-top-bar">
+        <button className="btn-back" onClick={() => navigate('/chapters')}>← 章一覧へ</button>
+        <div className="diagnosis-tag">{chapter?.section_title} · W{chapter?.week_number}</div>
+      </div>
       <QuizCounter current={currentIndex + 1} total={quizzes.length} />
       <div style={{ marginTop: 20 }}>
         <QuizCard key={currentQuiz.id} quiz={currentQuiz} onAnswer={submitAnswer} />
